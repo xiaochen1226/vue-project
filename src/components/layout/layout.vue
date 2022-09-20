@@ -1,6 +1,8 @@
 <template>
-  <router-view />
-  <FooterNav />
+  <div class="layout">
+    <router-view class="page" />
+    <FooterNav />
+  </div>
 </template>
 
 <script lang="ts">
@@ -13,4 +15,12 @@ export default defineComponent({
 })
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.layout {
+  height: 100%;
+  .page {
+    height: calc(100% - 50px);
+    overflow: auto;
+  }
+}
+</style>
