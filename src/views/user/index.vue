@@ -1,26 +1,48 @@
 <template>
   <div class="user">
-    <div class="header">
-      <img class="avatar" :src="imgurl" alt="avatar" />
+    <div class="header" v-if="user.name">
+      <img
+        class="avatar"
+        v-if="user.avatar_url"
+        :src="user.avatar_url"
+        alt="avatar"
+      />
+      <div class="no-avatar" v-else></div>
       <div class="header-content">
-        <p class="nickname">xiaochenshuaige</p>
-        <p class="username">账号名: 这个没id</p>
+        <p class="nickname">{{ user.name }}</p>
+        <p class="username">账号名: {{ user.nickname }}</p>
       </div>
-      <van-icon class="setting" name="setting-o" />
+      <van-icon class="setting" name="setting-o" @click="toUserInfo" />
+    </div>
+    <div class="header" v-else>
+      <div class="login-tip">
+        <span>请先登录</span>
+        <van-button round @click="toLogin">登 录</van-button>
+      </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-export default defineComponent({
-  setup() {
-    const imgurl = 'https://s1.ax1x.com/2022/09/20/xPohvt.jpg'
+<script setup lang="ts">
+import { onMounted } from '@vue/runtime-core'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
-    return {
-      imgurl
-    }
-  }
+const store = useStore()
+const router = useRouter()
+
+const user = store.state.user
+
+const toUserInfo = () => {
+  router.push('/setting')
+}
+
+const toLogin = () => {
+  router.push('/login')
+}
+
+onMounted(() => {
+  console.log(user)
 })
 </script>
 
@@ -32,6 +54,13 @@ export default defineComponent({
     background-color: antiquewhite;
     padding: 10px 20px;
     box-sizing: border-box;
+    .no-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: rgb(242, 243, 245);
+      float: left;
+    }
     .avatar {
       width: 80px;
       height: 80px;
@@ -63,6 +92,15 @@ export default defineComponent({
       height: 24px;
       display: block;
       float: right;
+    }
+    .login-tip {
+      height: 50px;
+      margin-top: 15px;
+      line-height: 50px;
+      > .van-button {
+        vertical-align: middle;
+        float: right;
+      }
     }
   }
 }

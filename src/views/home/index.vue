@@ -1,105 +1,103 @@
 <template>
   <div class="home">
     <van-search
-      v-model="value"
+      v-model="search"
       placeholder="请输入搜索关键词"
       input-align="center"
     />
     <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-      <van-swipe-item v-for="imgurl in imglist" :key="imgurl">
-        <img :src="imgurl" />
+      <van-swipe-item
+        v-for="item in swipelist"
+        :key="item.id"
+        @click="toProduct(item.id)"
+      >
+        <img :src="item.photo_url" />
       </van-swipe-item>
     </van-swipe>
-    <div class="pro-card">
+    <van-list
+      class="pro-card"
+      v-model:loading="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="onLoad"
+      :immediate-check="false"
+    >
       <ProductCard
-        v-for="item in productlist"
+        @click="toProduct(item.id)"
+        v-for="item in list"
         :productlist="item"
         :key="item.id"
       />
-    </div>
+    </van-list>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { onMounted, reactive, ref } from 'vue'
 import ProductCard from './components/product-card.vue'
-export default defineComponent({
-  components: {
-    ProductCard
-  },
-  setup() {
-    const imglist = [
-      'https://gw.alicdn.com/imgextra/i3/O1CN01Am8Sra21Zaice06ax_!!6000000006999-2-tps-1130-500.png_570x10000.jpg_.webp',
-      'https://img.alicdn.com/simba/img/TB1lUZLJVXXXXXtXFXXSutbFXXX.jpg',
-      'https://img.alicdn.com/imgextra/i4/6000000004047/O1CN01Y8A3Cu1flZaFyZZft_!!6000000004047-0-alimamazszw.jpg',
-      'https://img.alicdn.com/simba/img/TB1lUZLJVXXXXXtXFXXSutbFXXX.jpg',
-      'https://gw.alicdn.com/imgextra/i3/O1CN01ku1QvU1FdclsstCyR_!!6000000000510-0-tps-520-280.jpg_570x10000Q75.jpg_.webp'
-    ]
+import { userAuthTest } from '@/api/user'
+import { prodcutList } from '@/api/product'
+import { IProductList } from '@/api/product/type'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import Cookies from 'js-cookie'
 
-    const productlist = [
-      {
-        id: 1,
-        name: 'PSO BRAND 基础款纯运动',
-        price: '192.2',
-        consumption: '7000+',
-        url: 'https://s1.ax1x.com/2022/09/20/xP7BTO.jpg',
-        tip: '店铺已被142.0万人圈粉'
-      },
-      {
-        id: 2,
-        name: '垃圾袋家用手提式',
-        price: '11.8',
-        consumption: '8000+',
-        url: 'https://s1.ax1x.com/2022/09/20/xP7BTO.jpg',
-        tip: '店铺已被142.0万人圈粉'
-      },
-      {
-        id: 3,
-        name: '垃圾袋家用手提式',
-        price: '11.8',
-        consumption: '8000+',
-        url: 'https://s1.ax1x.com/2022/09/20/xP7BTO.jpg',
-        tip: '店铺已被142.0万人圈粉'
-      },
-      {
-        id: 4,
-        name: '垃圾袋家用手提式',
-        price: '11.8',
-        consumption: '8000+',
-        url: 'https://s1.ax1x.com/2022/09/20/xP7BTO.jpg',
-        tip: '店铺已被142.0万人圈粉'
-      },
-      {
-        id: 5,
-        name: '垃圾袋家用手提式',
-        price: '11.8',
-        consumption: '8000+',
-        url: 'https://s1.ax1x.com/2022/09/20/xP7BTO.jpg',
-        tip: '店铺已被142.0万人圈粉'
-      },
-      {
-        id: 6,
-        name: '垃圾袋家用手提式',
-        price: '11.8',
-        consumption: '8000+',
-        url: 'https://s1.ax1x.com/2022/09/20/xP7BTO.jpg',
-        tip: '店铺已被142.0万人圈粉'
-      },
-      {
-        id: 7,
-        name: '垃圾袋家用手提式',
-        price: '11.8',
-        consumption: '8000+',
-        url: 'https://s1.ax1x.com/2022/09/20/xP7BTO.jpg',
-        tip: '店铺已被142.0万人圈粉'
-      }
-    ]
+const router = useRouter()
+const store = useStore()
 
-    return {
-      imglist,
-      productlist
+const swipelist = reactive([])
+const list: IProductList[] = reactive([])
+const search = ref('')
+const loading = ref(false)
+const finished = ref(false)
+const pagination = reactive({ offset: 0, limit: 10 })
+
+let total = 0
+
+const toProduct = (id: number) => {
+  router.push({
+    name: 'product',
+    params: { id }
+  })
+}
+
+const onLoad = async () => {
+  const offset = (pagination.offset + 1) * pagination.limit
+  pagination.offset = offset
+
+  await getProductList()
+  loading.value = false
+
+  if (offset + pagination.limit >= total) {
+    finished.value = true
+  }
+}
+
+const getProductList = async () => {
+  const result = await prodcutList(pagination)
+  total = result.total
+  list.push(...result.data)
+  list.forEach((item, index) => {
+    if (index <= 4) {
+      swipelist.push(item)
+    }
+  })
+}
+
+const verifyLogin = async () => {
+  try {
+    await userAuthTest()
+  } catch (error) {
+    if (error.response.status === 401) {
+      Cookies.set('token', '')
+      store.dispatch('updateUserAsync', {})
     }
   }
+}
+
+onMounted(() => {
+  getProductList()
+  verifyLogin()
 })
 </script>
 

@@ -12,34 +12,62 @@ const routes: Array<RouteRecordRaw> = [
         path: '/home',
         name: 'home',
         component: () =>
-          import(/* webpackChunkName: "about" */ '../views/home/index.vue')
+          import(/* webpackChunkName: "home" */ '../views/home/index.vue')
       },
       {
         path: '/chat',
         name: 'chat',
         component: () =>
-          import(/* webpackChunkName: "about" */ '../views/chat/index.vue')
+          import(/* webpackChunkName: "chat" */ '../views/chat/index.vue')
       },
       {
         path: '/cart',
         name: 'cart',
         component: () =>
-          import(/* webpackChunkName: "about" */ '../views/cart/index.vue')
+          import(/* webpackChunkName: "cart" */ '../views/cart/index.vue')
       },
       {
         path: '/user',
         name: 'user',
         component: () =>
-          import(/* webpackChunkName: "about" */ '../views/user/index.vue')
+          import(/* webpackChunkName: "user" */ '../views/user/index.vue')
       }
     ]
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () =>
+      import(/* webpackChunkName: "login" */ '../views/user/login/index.vue')
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: () =>
+      import(
+        /* webpackChunkName: "register" */ '../views/user/register/index.vue'
+      )
+  },
+  {
+    path: '/product/:id',
+    name: 'product',
+    component: () =>
+      import(/* webpackChunkName: "product" */ '../views/product/index.vue')
+  },
+  {
+    path: '/setting',
+    name: 'setting',
+    component: () =>
+      import(
+        /* webpackChunkName: "setting" */ '../views/user/setting/index.vue'
+      )
+  },
+  {
+    path: '/info',
+    name: 'info',
+    component: () =>
+      import(/* webpackChunkName: "info" */ '../views/user/info/index.vue')
   }
-  // {
-  //   path: '/about',
-  //   name: 'about',
-  //   component: () =>
-  //     import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  // }
 ]
 
 const router = createRouter({

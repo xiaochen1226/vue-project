@@ -1,25 +1,21 @@
 <template>
   <div class="product-card">
-    <img class="product-img" :src="productlist.url" alt="" />
+    <img class="product-img" :src="props.productlist.photo_url" alt="" />
     <div class="content">
       <p class="product-name">{{ productlist.name }}</p>
       <p class="product-content">
         <span class="product-price">￥{{ productlist.price }}</span>
-        <span class="product-cons">{{ productlist.consumption }}人付款</span>
+        <!-- <span class="product-cons">{{ productlist.consumption }}人付款</span> -->
       </p>
-      <p class="product-tip">{{ productlist.tip }}</p>
+      <p class="product-tip">{{ productlist.tag }}</p>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-export default defineComponent({
-  props: {
-    productlist: {
-      default: () => []
-    }
-  }
+<script setup lang="ts">
+import { defineProps } from 'vue'
+const props = defineProps({
+  productlist: Object
 })
 </script>
 
@@ -30,6 +26,7 @@ export default defineComponent({
   background-color: white;
   .product-img {
     width: 100%;
+    height: 180px;
   }
   .content {
     height: 68px;
